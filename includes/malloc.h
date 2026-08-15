@@ -56,7 +56,6 @@ typedef enum{
 typedef struct s_block{
 	size_t	size;
 	size_t	prev_size;
-	//t_metadata	meta;
 	/* L'union indica al programma di usare lo stesso blocco di memoria sia per free_pointers che per data.
     Questo mi servirà per fare in modo che, quando il blocco di memoria è libero, ci salvo dentro le informazioni sulla lista
     dei blocchi liberi; quando è occupato, ci saranno i dati dell'utente.
@@ -74,9 +73,9 @@ typedef struct s_block{
 // il compilatore arrotonda 32 byte aggiungendo del padding, proprio per allineare e rendere il kernel piu' efficiente
 typedef struct s_zone{
 	size_t					zone_size;//8 byte
-	ZONE_AREA				zone_area;//4 byte
-	struct s_zone*			next_zone;//8 byte
 	size_t					allocated_blocks;//8 byte
+	struct s_zone*			next_zone;//8 byte
+	ZONE_AREA				zone_area;//4 byte
 }	t_zone;
 
 
@@ -84,17 +83,18 @@ typedef struct s_malloc_zones{
     t_zone  *tiny_zones;
     t_zone  *small_zones;
     t_zone  *large_zones;
-	size_t	pages_size;
+	size_t	system_pages_size;
 }   g_malloc_zones;
 
-void    *ft_malloc(size_t size);
-void	free(void *ptr);
-void	*ft_realloc(void *ptr, size_t size);
+void    	*ft_malloc(size_t size);
+void		free(void *ptr);
+void		*ft_realloc(void *ptr, size_t size);
 
-//utils
+// l implementazione e' nel file src/utils
 ZONE_AREA   get_zone_area(size_t size);
-bool    is_tiny_area(size_t size);
-bool    is_small_area(size_t size);
-bool    is_large_area(size_t size);
+
+bool    	is_tiny_area(size_t size);
+bool    	is_small_area(size_t size);
+bool    	is_large_area(size_t size);
 
 #endif
