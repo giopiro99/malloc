@@ -14,10 +14,6 @@ __attribute__((constructor)) void init_fundamental_stuffs(){
     malloc_zones.system_pages_size = sysconf(_SC_PAGESIZE);
 }
 
-void    *searc_for_prealloc_zone(){
-    return (NULL);
-}
-
 void    *alloc_large_area(size_t real_size){
 
     size_t total_required = real_size + sizeof(t_zone);

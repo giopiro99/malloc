@@ -86,8 +86,10 @@ typedef struct s_malloc_zones{
 	size_t	system_pages_size;
 }   g_malloc_zones;
 
+extern g_malloc_zones  malloc_zones;
+
 void    	*ft_malloc(size_t size);
-void		free(void *ptr);
+void		ft_free(void *ptr);
 void		*ft_realloc(void *ptr, size_t size);
 
 // l implementazione e' nel file src/utils
