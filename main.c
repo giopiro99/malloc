@@ -6,6 +6,8 @@
 #include <sys/mman.h>
 
 int main(){
+/*
+    test per richiesta large
     char *ptr = ft_malloc(4900);
     char *ptr2 = ft_malloc(4900);
     char *ptr3 = ft_malloc(4900);
@@ -38,6 +40,14 @@ int main(){
     ft_free(ptr3);
     ft_free(ptr4);
     ft_free(ptr5);
+*/
 
+    char *ptr = ft_malloc(10);
+    for (int i = 0; i < 10; i++){
+        ptr[i] = 'a';
+    }
+
+    printf("%s\n", ptr);
+    ft_free(ptr);
     return (0);
 }

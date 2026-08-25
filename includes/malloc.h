@@ -99,4 +99,14 @@ bool    	is_tiny_area(size_t size);
 bool    	is_small_area(size_t size);
 bool    	is_large_area(size_t size);
 
+//free functions
+bool    try_free_large_ptr(void* ptr);
+bool    try_free_small_ptr(void* ptr);
+bool	try_free_tiny_ptr(void* ptr);
+
+//malloc functions
+void    *alloc_large_area(size_t block_size);
+void    *request_tiny_memory(size_t block_size);
+void    *request_small_memory(size_t block_size);
+
 #endif
