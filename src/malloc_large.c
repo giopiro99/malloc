@@ -1,10 +1,9 @@
-#include "../includes/malloc.h"
+#include "../includes/malloc_internal.h"
 #include <sys/mman.h>
 #include <errno.h>
 
-void    *alloc_large_area(size_t size){
+void    *alloc_large_area(size_t block_size){
 
-    size_t  block_size = ALIGN_16(size + sizeof(t_block));
     size_t total_required = block_size + sizeof(t_zone);
     size_t aligned_page_size = ALIGN_PAGES(total_required, malloc_zones.system_pages_size);
 

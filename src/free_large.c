@@ -1,7 +1,21 @@
-#include "../includes/malloc.h"
+#include "../includes/malloc_internal.h"
 #include <stdio.h>
 #include <sys/mman.h>
 #include <errno.h>
+
+static inline bool  delete_zone(t_zone  *zone){
+    int status_returned = munmap(zone, zone->zone_size);
+    if (status_returned == -1){
+        #ifdef DEBUG
+            printf("%s", "errore in munmmap\n");
+            perror("munmapp errno=");
+        #endif
+        errno = EINVAL;
+        return (false);
+    }
+    printf("%s%d\n", "eliminata pagina large! Status=", status_returned);
+    return (true);
+}
 
 bool    try_free_large_ptr(void* ptr){
     t_zone  *current_zone = malloc_zones.large_zones;
@@ -16,34 +30,15 @@ bool    try_free_large_ptr(void* ptr){
             #endif
 
             if (current_zone->next_zone == NULL){
-                int status_returned = munmap(current_zone, current_zone->zone_size);
-                if (status_returned == -1){
-                    #ifdef DEBUG
-                        printf("%s", "errore in munmmap\n");
-                        perror("munmapp errno=");
-                    #endif
-                    errno = EINVAL;
-                    return (false);
-                }
-                printf("%s%d\n", "eliminata pagina large! Status=", status_returned);
-                return (true);           
-            }else{
+                return (delete_zone(current_zone));                           
+            }
+            else{
                 if (prev_zone){
                     prev_zone->next_zone = current_zone->next_zone;
                 }else{
                     malloc_zones.large_zones = current_zone->next_zone;
                 }
-                int status_returned = munmap(current_zone, current_zone->zone_size);
-                if (status_returned == -1){
-                    #ifdef DEBUG
-                        printf("%s", "errore in munmmap\n");
-                        perror("munmapp errno=");
-                    #endif
-                    errno = EINVAL;
-                    return (false);
-                }
-                printf("%s%d\n", "eliminata pagina large! Status=", status_returned);
-                return (true);
+                return (delete_zone(current_zone));
             }
         }
         prev_zone = current_zone;

@@ -1,4 +1,4 @@
-#include "../includes/malloc.h"
+#include "../includes/malloc_internal.h"
 
 void    ft_free(void *ptr){
     if (ptr == NULL) return;
