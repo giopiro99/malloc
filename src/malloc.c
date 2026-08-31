@@ -40,10 +40,10 @@ void    *ft_malloc(size_t size){
     }
 
     if (is_tiny_area(size)){
-        final_ptr = request_tiny_memory(block_size);
+        final_ptr = request_generic_memory(&malloc_zones.tiny_zones,  &malloc_zones.first_tiny_block_free, block_size, TINY);
     }
     else if (is_small_area(size)){
-        final_ptr = request_small_memory(block_size);
+        final_ptr = request_generic_memory( &malloc_zones.small_zones, &malloc_zones.first_small_block_free, block_size, SMALL);
     }
 
     return (final_ptr);

@@ -75,6 +75,8 @@ static inline void    *allocate_new_small_page(size_t block_size){
         new_zone->allocated_blocks++;
     }
 
+    
+
     final_ptr = new_block->payload.data;
     return (final_ptr);
 }
