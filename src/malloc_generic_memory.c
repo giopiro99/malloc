@@ -28,9 +28,9 @@ void    initialize_block(t_block *new_block, size_t block_size, ZONE_AREA area){
     set_zone(new_block->size, area);
 }
 
-void    initialize_free_block(t_block *new_free_block, size_t prev_size, size_t zone_size, ZONE_AREA area){
+void    initialize_free_block(t_block *new_free_block, size_t prev_size, size_t free_block_size, ZONE_AREA area){
     new_free_block->prev_size = prev_size;
-    new_free_block->size = zone_size - sizeof(t_zone) - prev_size;
+    new_free_block->size = free_block_size;
     set_free(new_free_block->size);
     set_zone(new_free_block->size, area);
 }
@@ -74,6 +74,7 @@ void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t
     initialize_block(new_block, block_size, area);
 
     t_block *new_free_block = (t_block *)((char *)new_block + block_size);
+    size_t  new_free_block_size = zone_size - block_size;
     initialize_free_block(new_free_block, block_size, zone_size, area);
     add_new_free_block(first_free_block, new_free_block);
 
@@ -100,7 +101,7 @@ t_zone  *get_zone_from_block(t_zone **head_zone, t_block *block){
     return (NULL);
 }
 
-void    update_free_list(t_block **first_free_block, t_block *block){
+void    remove_block_from_free_list(t_block **first_free_block, t_block *block){
     t_block *prev_free_block = block->payload.free_pointers.back;
     t_block *next_free_block = block->payload.free_pointers.next;
 
@@ -119,11 +120,24 @@ void    update_free_list(t_block **first_free_block, t_block *block){
 void    *handle_perfect_fit(t_block **first_free_block, t_block *block){
     void    *final_ptr = NULL;
 
-    update_free_list(first_free_block, block);
+    remove_block_from_free_list(first_free_block, block);
 
     final_ptr = block->payload.data;
     set_allocated(block->size);
     return (final_ptr);
+}
+
+void    split_block(t_block **first_free_block, t_block *free_block, size_t block_size){
+    
+    remove_block_from_free_list(first_free_block, free_block);
+
+    // e se nella zona ci sono piu' blocchi? il calcolo non va bene
+    size_t  free_block_size = get_size(free_block->size) - block_size;
+    t_block *new_free_block = (t_block *)((char *)free_block + block_size);
+    ZONE_AREA   area = get_zone_area(free_block->size);
+
+    initialize_free_block(new_free_block, block_size, free_block_size, area);
+    add_new_free_block(first_free_block, new_free_block);
 }
 
 void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, size_t block_size,  ZONE_AREA area){
@@ -140,8 +154,9 @@ void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, 
                 final_ptr = handle_perfect_fit(first_free_block, free_block);
             }
             else{
-                //qua devo splittare
-
+                split_block(first_free_block, free_block, block_size);
+                set_allocated(free_block->size);
+                final_ptr = free_block->payload.data;
             }
         }
         else if (current_size == block_size){
