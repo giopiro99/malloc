@@ -10,7 +10,7 @@ g_malloc_zones  malloc_zones;
 __attribute__((constructor)) void init_fundamental_stuffs(){
     malloc_zones.tiny_zones = NULL;
     malloc_zones.small_zones = NULL;
-    malloc_zones.large_zones= NULL;
+    malloc_zones.large_zones = NULL;
     malloc_zones.first_tiny_block_free = NULL;
     malloc_zones.first_small_block_free = NULL;
     malloc_zones.system_pages_size = sysconf(_SC_PAGESIZE);

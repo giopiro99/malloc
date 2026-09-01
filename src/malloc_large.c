@@ -8,13 +8,18 @@ void    *alloc_large_area(size_t block_size){
     size_t aligned_page_size = ALIGN_PAGES(total_required, malloc_zones.system_pages_size);
 
     #ifdef DEBUG
-            printf("pagina large allocata, dimensione=%lu\n", aligned_page_size);
-            printf("blocco richiesto=%lu\n", block_size);
+            print_str("pagina large allocata, dimensione=");
+            print_nbr(aligned_page_size);
+            print_str("\n");
+            print_str("blocco richiesto=");
+            print_nbr(block_size);
+            print_str("\n");
     #endif
     void *ptr = mmap(NULL, aligned_page_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     if (ptr == MAP_FAILED){
         #ifdef DEBUG
-            perror("DEBUG: mmap fallita dentro alloc_large_area\n");
+            print_str("DEBUG: mmap fallita dentro alloc_large_area\n");
+            perror("mmap");
         #endif
         errno = ENOMEM;
         return (NULL);
@@ -22,28 +27,45 @@ void    *alloc_large_area(size_t block_size){
 
     if (malloc_zones.large_zones == NULL){
         #ifdef DEBUG
-            printf("prima large zone allocata, indirizzo %p\n", ptr);
+            print_str("prima large zone allocata, indirizzo=");
+            print_hex_address(ptr);
+            print_str("\n");
         #endif
         malloc_zones.large_zones = ptr;
         malloc_zones.large_zones->next_zone = NULL;
         malloc_zones.large_zones->zone_area = LARGE;
         malloc_zones.large_zones->zone_size = aligned_page_size;
+        print_str("size=");
+        print_nbr(aligned_page_size);
+        print_str("\n");
     }else{
         #ifdef DEBUG
-            printf("large zones gia' esistenti, ne aggiungo una nuova, indirizzo %p\n", ptr);
+            print_str("large zones gia' esistenti, ne aggiungo una nuova, indirizzo=");
+            print_hex_address(ptr);
+            print_str("\n");
         #endif
         t_zone  *new_zone = ptr;
-        new_zone->next_zone = malloc_zones.large_zones;
+        t_zone  *old_first_zone = malloc_zones.large_zones;
+        new_zone->next_zone = old_first_zone;
         malloc_zones.large_zones = new_zone;
         new_zone->zone_area = LARGE;
         new_zone->zone_size = aligned_page_size;
+        print_str("size=");
+        print_nbr(aligned_page_size);
+        print_str("\n");
     }
 
     // castando a char, facciamo in modo che si sposti esattamente di sizeof(byte che vogliamo saltare) perche' char = 1 byte
     //senza questo farebbe una moltiplicazione * t_zone
     t_block *new_large_block = (t_block *)((char *)ptr + sizeof(t_zone));
     new_large_block->size = block_size;
+    print_str("size del blocco large=");
+    print_nbr(get_size(new_large_block->size));
+    print_str("\n");
+    set_allocated(new_large_block->size);
+    set_zone(new_large_block->size, LARGE);
 
+    ptr = new_large_block->payload.data;
     //possiamo ritornare data, perche' grazie all union, data sara' il primo blocco disponibile dopo i metadati
-    return (new_large_block->payload.data);
+    return (ptr);
 }

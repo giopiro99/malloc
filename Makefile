@@ -8,7 +8,7 @@ SRCS    = main.c $(wildcard $(SRC_DIR)/*.c)
 OBJS    = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 CC      = cc
-CFLAGS  = -Wall -Werror -Wextra
+CFLAGS  = -Wall -Werror -Wextra -g3
 
 VAL     = valgrind --leak-check=full --track-origins=yes
 

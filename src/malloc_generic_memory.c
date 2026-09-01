@@ -38,15 +38,24 @@ void    initialize_free_block(t_block *new_free_block, size_t prev_size, size_t 
 void    add_new_free_block(t_block **first_free_block, t_block *new_free_block){    
     if ((*first_free_block) == NULL){
         (*first_free_block) = new_free_block;
+        (*first_free_block)->payload.free_pointers.next = NULL;
+        (*first_free_block)->payload.free_pointers.back = NULL;
     }
     else{
         t_block *old_first = (*first_free_block);
         old_first->payload.free_pointers.back = new_free_block;
         new_free_block->payload.free_pointers.next = old_first;
+        new_free_block->payload.free_pointers.back = NULL;
+        (*first_free_block) = new_free_block;
     }
 }
 
 void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t block_size, ZONE_AREA area){
+    
+    #ifdef DEBUG
+        print_str("richiesta di una nuova pagina di memoria in corso\n");
+    #endif
+    
     void    *final_ptr = NULL;
     size_t  zone_size = 0;
 
@@ -60,9 +69,10 @@ void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t
 
     if (final_ptr == MAP_FAILED){
         #ifdef DEBUG
-            printf("errore in mmap per zona tiny/small:\nblocco richiesto=%d", block_size);
+            print_str("errore in mmap per zona tiny/small:\nblocco richiesto=");
+            print_nbr(block_size);
         #endif
-        errno = EINVAL;
+        errno = ENOMEM;
         perror("mmap");
         return (NULL);
     }
@@ -74,8 +84,8 @@ void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t
     initialize_block(new_block, block_size, area);
 
     t_block *new_free_block = (t_block *)((char *)new_block + block_size);
-    size_t  new_free_block_size = zone_size - block_size;
-    initialize_free_block(new_free_block, block_size, zone_size, area);
+    size_t  new_free_block_size = zone_size - block_size - sizeof(t_zone);
+    initialize_free_block(new_free_block, block_size, new_free_block_size, area);
     add_new_free_block(first_free_block, new_free_block);
 
     new_zone->allocated_blocks++;
@@ -97,6 +107,8 @@ t_zone  *get_zone_from_block(t_zone **head_zone, t_block *block){
         if ((void *)block > (void *)current_zone && (void *)block < end_zone){
             return (current_zone);
         }
+
+        current_zone = current_zone->next_zone;
     }
     return (NULL);
 }
@@ -109,7 +121,7 @@ void    remove_block_from_free_list(t_block **first_free_block, t_block *block){
         prev_free_block->payload.free_pointers.next = next_free_block;
     }
     else{
-        (*first_free_block)->payload.free_pointers.next = next_free_block;
+        (*first_free_block) = next_free_block;
     }
 
     if(next_free_block){
@@ -131,10 +143,9 @@ void    split_block(t_block **first_free_block, t_block *free_block, size_t bloc
     
     remove_block_from_free_list(first_free_block, free_block);
 
-    // e se nella zona ci sono piu' blocchi? il calcolo non va bene
     size_t  free_block_size = get_size(free_block->size) - block_size;
     t_block *new_free_block = (t_block *)((char *)free_block + block_size);
-    ZONE_AREA   area = get_zone_area(free_block->size);
+    ZONE_AREA   area = get_zone(free_block->size);
 
     initialize_free_block(new_free_block, block_size, free_block_size, area);
     add_new_free_block(first_free_block, new_free_block);
@@ -143,19 +154,21 @@ void    split_block(t_block **first_free_block, t_block *free_block, size_t bloc
 void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, size_t block_size,  ZONE_AREA area){
     
     void    *final_ptr = NULL;
-    t_block *free_block = *first_free_block;
+    t_block *free_block = (*first_free_block);
     t_zone  *assigned_zone = NULL;
     size_t  current_size = 0;
 
     while (free_block != NULL && final_ptr == NULL){
-        current_size = free_block->size;
+        current_size = get_size(free_block->size);
         if (current_size > block_size){
             if (current_size - block_size <= sizeof(t_block)){
                 final_ptr = handle_perfect_fit(first_free_block, free_block);
             }
             else{
                 split_block(first_free_block, free_block, block_size);
+                free_block->size = block_size;
                 set_allocated(free_block->size);
+                set_zone(free_block->size, area);
                 final_ptr = free_block->payload.data;
             }
         }

@@ -110,7 +110,12 @@ bool	try_free_tiny_ptr(void* ptr);
 
 //malloc functions
 void    *alloc_large_area(size_t block_size);
-void    *request_tiny_memory(size_t block_size);
-void    *request_small_memory(size_t block_size);
 void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, size_t block_size,  ZONE_AREA area);
+
+
+//print utils
+void    print_str(char *str);
+void    print_nbr(size_t n);
+void    print_hex_address(void *ptr);
+
 #endif
