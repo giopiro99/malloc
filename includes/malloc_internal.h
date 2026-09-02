@@ -96,18 +96,16 @@ typedef struct s_malloc_zones{
 
 extern g_malloc_zones  malloc_zones;
 
-// l implementazione e' nel file src/utils
-ZONE_AREA   get_zone_area(size_t size);
-
-bool    	is_tiny_area(size_t size);
-bool    	is_small_area(size_t size);
-bool    	is_large_area(size_t size);
+//boolean utils
+bool    is_tiny_area(size_t size);
+bool    is_small_area(size_t size);
+bool    is_large_area(size_t size);
 
 //free functions
 void    try_free_large_ptr(t_zone *assigned_zone, void* ptr);
 void    try_free_generic_memory(t_zone *assigned_area, void *ptr);
 
-//free functions utils
+//free utils
 void    delete_zone_from_list(t_zone **head_zone, t_zone *zone_to_delete);
 t_zone  *find_zone_by_ptr(void *ptr);
 
@@ -115,15 +113,14 @@ t_zone  *find_zone_by_ptr(void *ptr);
 void    *alloc_large_area(size_t block_size);
 void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, size_t block_size,  ZONE_AREA area);
 
-//malloc functions utils
-void    add_new_zone(t_zone **head_zone, t_zone *new_zone);
+//malloc utils
 void    initialize_zone(t_zone **head_zone, t_zone *new_zone, ZONE_AREA area, size_t zone_size);
-void    initialize_block(t_block *new_block, size_t block_size, ZONE_AREA area);
+void    initialize_block(t_block *new_block, size_t prev_size, size_t block_size, ZONE_AREA area);
 void    initialize_free_block(t_block *new_free_block, size_t prev_size, size_t free_block_size, ZONE_AREA area);
 void    add_new_free_block(t_block **first_free_block, t_block *new_free_block);
 
 //malloc generic memory utils
-void    split_block(t_block **first_free_block, t_block *free_block, size_t block_size);
+void    split_block(t_block **first_free_block, t_block *free_block, t_zone *assigned_zone, size_t block_size);
 void    *handle_perfect_fit(t_block **first_free_block, t_block *block);
 t_zone  *get_zone_from_block(t_zone **head_zone, t_block *block);
 

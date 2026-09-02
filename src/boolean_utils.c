@@ -1,14 +1,6 @@
 #include <unistd.h>
 #include "../includes/malloc_internal.h"
 
-ZONE_AREA   get_zone_area(size_t size){
-    if (size <= LIMIT_TINY_ZONE_AREA)
-        return (TINY);
-    else if (size <= LIMIT_SMALL_ZONE_AREA)
-        return (SMALL);
-    return (LARGE);
-}
-
 bool    is_tiny_area(size_t size){
     return (size <= LIMIT_TINY_ZONE_AREA ? true : false);
 }

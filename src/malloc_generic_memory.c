@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <sys/mman.h>
 
-void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t block_size, ZONE_AREA area){
+static inline void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t block_size, ZONE_AREA area){
     
     #ifdef DEBUG
         print_str("richiesta di una nuova pagina di memoria in corso\n");
@@ -33,7 +33,7 @@ void    *request_new_page(t_zone **head_zone, t_block **first_free_block, size_t
     initialize_zone(head_zone, new_zone, area, zone_size);
 
     t_block *new_block = (t_block *)((char *)new_zone + sizeof(t_zone));
-    initialize_block(new_block, block_size, area);
+    initialize_block(new_block, 0, block_size, area);
 
     t_block *new_free_block = (t_block *)((char *)new_block + block_size);
     size_t  new_free_block_size = zone_size - block_size - sizeof(t_zone);
@@ -55,15 +55,16 @@ void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, 
 
     while (free_block != NULL && final_ptr == NULL){
         current_size = get_size(free_block->size);
-        if (current_size > block_size){
+        if (current_size >= block_size){
+            assigned_zone = get_zone_from_block(head_zone, free_block);
+            assigned_zone->allocated_blocks++;
+
             if (current_size - block_size <= sizeof(t_block)){
                 final_ptr = handle_perfect_fit(first_free_block, free_block);
             }
             else{
-                split_block(first_free_block, free_block, block_size);
-                free_block->size = block_size;
-                set_allocated(free_block->size);
-                set_zone(free_block->size, area);
+                split_block(first_free_block, free_block, assigned_zone, block_size);
+                initialize_block(free_block, free_block->prev_size, block_size, area);
                 final_ptr = free_block->payload.data;
             }
         }
@@ -77,13 +78,6 @@ void    *request_generic_memory(t_zone **head_zone, t_block **first_free_block, 
 
     if (final_ptr == NULL){
         final_ptr = request_new_page(head_zone, first_free_block, block_size, area);
-    }
-
-    if (free_block){
-        assigned_zone = get_zone_from_block(head_zone, free_block);
-        if(assigned_zone){
-            assigned_zone->allocated_blocks++;
-        }
     }
 
     return (final_ptr);

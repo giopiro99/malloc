@@ -23,7 +23,7 @@ void    *alloc_large_area(size_t block_size){
     // castando a char, facciamo in modo che si sposti esattamente di sizeof(byte che vogliamo saltare) perche' char = 1 byte
     //senza questo farebbe una moltiplicazione * t_zone
     t_block *new_large_block = (t_block *)((char *)ptr + sizeof(t_zone));
-    initialize_block(new_large_block, block_size, LARGE);
+    initialize_block(new_large_block, 0, block_size, LARGE);
     
     new_large_zone->allocated_blocks++;
     ptr = new_large_block->payload.data;

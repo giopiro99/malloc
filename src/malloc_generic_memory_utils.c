@@ -44,8 +44,20 @@ void    *handle_perfect_fit(t_block **first_free_block, t_block *block){
     return (final_ptr);
 }
 
-void    split_block(t_block **first_free_block, t_block *free_block, size_t block_size){
-    
+static inline void  try_to_update_prev_size(t_block *block, t_zone *assigned_zone){
+    void    *end_zone = (void *)((char *)assigned_zone + assigned_zone->zone_size);
+    size_t  block_size = get_size(block->size);
+
+    t_block *next_block = (t_block *)((char *)block + block_size);
+    if ((void *)next_block >= end_zone){
+        return ;
+    }
+
+    next_block->prev_size = block_size;
+}
+
+void    split_block(t_block **first_free_block, t_block *free_block, t_zone *assigned_zone, size_t block_size){
+
     remove_block_from_free_list(first_free_block, free_block);
 
     size_t  free_block_size = get_size(free_block->size) - block_size;
@@ -54,4 +66,7 @@ void    split_block(t_block **first_free_block, t_block *free_block, size_t bloc
 
     initialize_free_block(new_free_block, block_size, free_block_size, area);
     add_new_free_block(first_free_block, new_free_block);
+
+    //devo aggiornare il prev size del blocco successivo a quello che e' diventato libero
+    try_to_update_prev_size(new_free_block, assigned_zone);
 }
