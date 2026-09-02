@@ -3,14 +3,16 @@
 void    ft_free(void *ptr){
     if (ptr == NULL) return;
 
-    if (try_free_tiny_ptr(ptr)){
+    t_zone  *assigned_area = find_zone_by_ptr(ptr);
+    if (assigned_area == NULL){
         return ;
     }
-    if (try_free_small_ptr(ptr)){
-        return ;
+
+    if (assigned_area->zone_area == LARGE){
+        try_free_large_ptr(assigned_area, ptr);
     }
-    if (try_free_large_ptr(ptr)){
-        return ;
+    else{
+        try_free_generic_memory(assigned_area, ptr);
     }
     return ;
 }

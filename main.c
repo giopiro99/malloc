@@ -110,9 +110,9 @@ int main(){
 
     test_large_malloc();
 
-    //test_small_malloc();
+    test_small_malloc();
 
-    //test_tiny_malloc();
+    test_tiny_malloc();
 
     show_alloc_mem();
 

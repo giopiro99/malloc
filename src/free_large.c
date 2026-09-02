@@ -3,46 +3,26 @@
 #include <sys/mman.h>
 #include <errno.h>
 
-static inline bool  delete_zone(t_zone  *zone){
-    int status_returned = munmap(zone, zone->zone_size);
-    if (status_returned == -1){
-        #ifdef DEBUG
-            printf("%s", "errore in munmmap\n");
-            perror("munmapp errno=");
-        #endif
-        errno = EINVAL;
-        return (false);
-    }
-    printf("%s%d\n", "eliminata pagina large! Status=", status_returned);
-    return (true);
-}
-
-bool    try_free_large_ptr(void* ptr){
-    t_zone  *current_zone = malloc_zones.large_zones;
-    t_zone  *prev_zone = NULL;
-    t_block *current_block = NULL;
-    while (current_zone != NULL){
-        current_block = (t_block*)((char *)(current_zone) + sizeof(t_zone));
-        if (current_block && current_block->payload.data == ptr){
-
+void    try_free_large_ptr(t_zone *assigned_zone, void* ptr){
+    delete_zone_from_list(&malloc_zones.large_zones, assigned_zone);
+    t_block *assigned_block = (t_block *)((char *)assigned_zone + sizeof(t_zone));
+    if (assigned_block->payload.data == ptr){
+        int status_returned = munmap(assigned_zone, assigned_zone->zone_size);
+        if (status_returned == -1){
+            perror("munmap");
+            errno = EINVAL;
             #ifdef DEBUG
-                printf("%s", "blocco large da eliminare trovato!\n");
+                print_str("errore in munmap per zona=");
+                print_hex_address(assigned_zone);
             #endif
-
-            if (current_zone->next_zone == NULL){
-                return (delete_zone(current_zone));                           
-            }
-            else{
-                if (prev_zone){
-                    prev_zone->next_zone = current_zone->next_zone;
-                }else{
-                    malloc_zones.large_zones = current_zone->next_zone;
-                }
-                return (delete_zone(current_zone));
-            }
         }
-        prev_zone = current_zone;
-        current_zone = current_zone->next_zone;
     }
-    return (false);
+    else{
+        #ifdef DEBUG
+            print_str("puntatore a payload errato indirizzo ptr=");
+            print_hex_address(ptr);
+            print_str("indirizzo payload=");
+            print_hex_address(assigned_block->payload.data);
+        #endif
+    }
 }

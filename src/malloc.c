@@ -7,7 +7,7 @@
 
 g_malloc_zones  malloc_zones;
 
-__attribute__((constructor)) void init_fundamental_stuffs(){
+void init_fundamental_stuffs(){
     malloc_zones.tiny_zones = NULL;
     malloc_zones.small_zones = NULL;
     malloc_zones.large_zones = NULL;
@@ -25,12 +25,17 @@ __attribute__((constructor)) void init_fundamental_stuffs(){
 
 void    *ft_malloc(size_t size){
     
+    
     if (size == 0)
         return (NULL);
+    
+    if (malloc_zones.system_pages_size == 0){
+        init_fundamental_stuffs();
+    }
 
     void    *final_ptr = NULL;
-
     size_t  block_size = ALIGN_16(size + sizeof(t_block));
+
     if (is_large_area(size)){
         final_ptr = alloc_large_area(block_size);
     }
@@ -40,10 +45,12 @@ void    *ft_malloc(size_t size){
     }
 
     if (is_tiny_area(size)){
-        final_ptr = request_generic_memory(&malloc_zones.tiny_zones,  &malloc_zones.first_tiny_block_free, block_size, TINY);
+        final_ptr = request_generic_memory(&malloc_zones.tiny_zones,  
+            &malloc_zones.first_tiny_block_free, block_size, TINY);
     }
     else if (is_small_area(size)){
-        final_ptr = request_generic_memory( &malloc_zones.small_zones, &malloc_zones.first_small_block_free, block_size, SMALL);
+        final_ptr = request_generic_memory( &malloc_zones.small_zones,
+            &malloc_zones.first_small_block_free, block_size, SMALL);
     }
 
     return (final_ptr);
