@@ -51,6 +51,7 @@ static inline void  print_large_zones(){
 
 void    show_alloc_mem(){
     if (malloc_zones.tiny_zones == NULL && malloc_zones.small_zones == NULL && malloc_zones.large_zones == NULL){
+        print_str("==================NESSUNA ZONA ALLOCATA==================\n\n");
         return ;
     }
     print_generic_zones(malloc_zones.tiny_zones, "TINY : ");

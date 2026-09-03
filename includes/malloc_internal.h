@@ -109,6 +109,7 @@ void    try_free_generic_memory(t_zone *assigned_area, void *ptr);
 void    delete_zone_from_list(t_zone **head_zone, t_zone *zone_to_delete);
 t_zone  *find_zone_by_ptr(void *ptr);
 void    return_memory_to_kernel(t_zone *assigned_zone);
+t_block *find_block_by_ptr(t_zone *assigned_zone, void *ptr);
 
 //malloc functions
 void    *alloc_large_area(size_t block_size);

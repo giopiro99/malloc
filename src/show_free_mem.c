@@ -44,6 +44,7 @@ void    show_free_mem(){
     print_generic_free_blocks(free_tiny_blocks, "FREE TINY : \n");
     print_generic_free_blocks(free_small_blocks, "FREE SMALL : \n");
     if (free_tiny_blocks == NULL && free_small_blocks == NULL){
+        print_str("==================NESSUNA PAGINA ALLOCATA==================\n\n");
         return ;
     }
     print_str("==================FINE SHOW FREE MEM==================\n\n");

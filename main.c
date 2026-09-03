@@ -4,111 +4,100 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-void    test_large_malloc(){
-    //test per richiesta large
-    char *large_ptr = ft_malloc(4900);
-    char *large_ptr2 = ft_malloc(4900);
-    char *large_ptr3 = ft_malloc(4900);
-    char *large_ptr4 = ft_malloc(4900);
-    char *large_ptr5 = ft_malloc(4900);
-
-    for (int i = 0; i < 4899; i++){
-        large_ptr[i] = 'a';
-        large_ptr2[i] = 'b';
-        large_ptr3[i] = 'c';
-        large_ptr4[i] = 'd';
-        large_ptr5[i] = 'e';
+static inline void  initialize_ptr(char *ptr, char *ptr1, char *ptr2, char *ptr3,
+                                    char *ptr4, char *ptr5, int size){
+    for (int i = 0; i < size; i++){
+        ptr[i] = 'a';
+        ptr1[i] = 'b';
+        ptr2[i] = 'c';
+        ptr3[i] = 'd';
+        ptr4[i] = 'e';
+        ptr5[i] = 'f';
     }
-    large_ptr[4899] = '\0';
-    large_ptr2[4899] = '\0';
-    large_ptr3[4899] = '\0';
-    large_ptr4[4899] = '\0';
-    large_ptr5[4899] = '\0';
+
+    ptr[size] = '\0';
+    ptr1[size] = '\0';
+    ptr2[size] = '\0';
+    ptr3[size] = '\0';
+    ptr4[size] = '\0';
+    ptr5[size] = '\0';
+}
+
+static inline void  free_ptr(char *ptr, char *ptr1, char *ptr2, char *ptr3,
+                                char *ptr4, char *ptr5){
+    ft_free(ptr);
+    ft_free(ptr1);
+    ft_free(ptr2);
+    ft_free(ptr3);
+    ft_free(ptr4);
+    ft_free(ptr5);
+}
+
+void    test_large_malloc(){
+    int large_size = 590867;
+    //test per richiesta large
+    char *large_ptr = ft_malloc(large_size);
+    char *large_ptr1 = ft_malloc(large_size);
+    char *large_ptr2 = ft_malloc(large_size);
+    char *large_ptr3 = ft_malloc(large_size);
+    char *large_ptr4 = ft_malloc(large_size);
+    char *large_ptr5 = ft_malloc(large_size);
+
+    initialize_ptr(large_ptr, large_ptr1, large_ptr2, large_ptr3, large_ptr4, large_ptr5, large_size);
     show_alloc_mem();
 
-    ft_free(large_ptr);
-    ft_free(large_ptr2);
-    ft_free(large_ptr3);
-    ft_free(large_ptr4);
-    ft_free(large_ptr5);
+    free_ptr(large_ptr, large_ptr1, large_ptr2, large_ptr3, large_ptr4, large_ptr5);
 
     show_alloc_mem();
 }
 
 void    test_small_malloc(){
-    char *small_ptr = ft_malloc(300);
-    char *small_ptr1 = ft_malloc(300);
-    char *small_ptr2 = ft_malloc(300);
-    char *small_ptr3 = ft_malloc(300);
-    char *small_ptr4 = ft_malloc(300);
-    char *small_ptr5 = ft_malloc(300);
+    int small_size = 287;
+    char *small_ptr = ft_malloc(small_size);
+    char *small_ptr1 = ft_malloc(small_size);
+    char *small_ptr2 = ft_malloc(small_size);
+    char *small_ptr3 = ft_malloc(small_size);
+    char *small_ptr4 = ft_malloc(small_size);
+    char *small_ptr5 = ft_malloc(small_size);
     
-    for (int i = 0; i < 299; i++){
-        small_ptr[i] = 'a';
-        small_ptr1[i] = 'b';
-        small_ptr2[i] = 'c';
-        small_ptr3[i] = 'd';
-        small_ptr4[i] = 'e';
-        small_ptr5[i] = 'f';
-    }
-
-    small_ptr[299] = '\0';
-    small_ptr1[299] = '\0';
-    small_ptr2[299] = '\0';
-    small_ptr3[299] = '\0';
-    small_ptr4[299] = '\0';
-    small_ptr5[299] = '\0';
+    initialize_ptr(small_ptr, small_ptr1, small_ptr2, small_ptr3, small_ptr4, small_ptr5, small_size);
 
     show_alloc_mem();
 
-
-    ft_free(small_ptr1);
-    ft_free(small_ptr2);
+    free_ptr(small_ptr, small_ptr1, small_ptr2, small_ptr3, small_ptr4, small_ptr5);
 
     show_alloc_mem();
     show_free_mem();
-
-    ft_free(small_ptr);
-    ft_free(small_ptr3);
-    ft_free(small_ptr4);
-    ft_free(small_ptr5);
-
-
-
 }
 
 void    test_tiny_malloc(){
-    char *tiny_ptr = ft_malloc(50);
-    char *tiny_ptr1 = ft_malloc(50);
-    char *tiny_ptr2 = ft_malloc(50);
-    char *tiny_ptr3 = ft_malloc(50);
-    char *tiny_ptr4 = ft_malloc(50);
-    char *tiny_ptr5 = ft_malloc(50);
+    int tiny_size = 1;
+    char *tiny_ptr = ft_malloc(tiny_size);
+    char *tiny_ptr1 = ft_malloc(tiny_size);
+    char *tiny_ptr2 = ft_malloc(tiny_size);
+    char *tiny_ptr3 = ft_malloc(tiny_size);
+    char *tiny_ptr4 = ft_malloc(tiny_size);
+    char *tiny_ptr5 = ft_malloc(tiny_size);
     
-    for (int i = 0; i < 49; i++){
-        tiny_ptr[i] = 'a';
-        tiny_ptr1[i] = 'b';
-        tiny_ptr2[i] = 'c';
-        tiny_ptr3[i] = 'd';
-        tiny_ptr4[i] = 'e';
-        tiny_ptr5[i] = 'f';
-    }
-    tiny_ptr[49] = '\0';
-    tiny_ptr1[49] = '\0';
-    tiny_ptr2[49] = '\0';
-    tiny_ptr3[49] = '\0';
-    tiny_ptr4[49] = '\0';
-    tiny_ptr5[49] = '\0';
+    initialize_ptr(tiny_ptr, tiny_ptr1, tiny_ptr2, tiny_ptr3, tiny_ptr4, tiny_ptr5, tiny_size);
+
+    tiny_ptr = ft_realloc(tiny_ptr, 5);
+    show_alloc_mem();
+
+    free_ptr(tiny_ptr, tiny_ptr1, tiny_ptr2, tiny_ptr3, tiny_ptr4, tiny_ptr5);
+
+    show_alloc_mem();
+    show_free_mem();
 
 }
 
 int main(){
 
-    //test_large_malloc();
+    test_large_malloc();
 
     test_small_malloc();
 
-    //test_tiny_malloc();
+    test_tiny_malloc();
 
 
     return (0);

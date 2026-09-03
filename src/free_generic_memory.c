@@ -50,6 +50,10 @@ static inline void  try_to_merge_right_block(t_block **first_free_blocks, t_bloc
 }
 
 static inline void  *try_to_merge_left_block(t_block **first_free_blocks, t_block *assigned_block, void *start_zone){
+    if (assigned_block->prev_size == 0){
+        return assigned_block;
+    }
+
     t_block *prev_block = (t_block *)((char *)assigned_block - assigned_block->prev_size);
 
     if ((void *)assigned_block <= start_zone || (void *)prev_block <= start_zone){
