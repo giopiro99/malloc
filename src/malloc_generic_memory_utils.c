@@ -1,6 +1,6 @@
 #include "../includes/malloc_internal.h"
 
-static inline void    remove_block_from_free_list(t_block **first_free_block, t_block *block){
+void    remove_block_from_free_list(t_block **first_free_block, t_block *block){
     t_block *prev_free_block = block->payload.free_pointers.back;
     t_block *next_free_block = block->payload.free_pointers.next;
 

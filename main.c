@@ -1,7 +1,6 @@
 #include "includes/malloc.h"
 #include "includes/malloc_internal.h"
 #include <stdint.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <sys/mman.h>
 
@@ -25,12 +24,15 @@ void    test_large_malloc(){
     large_ptr3[4899] = '\0';
     large_ptr4[4899] = '\0';
     large_ptr5[4899] = '\0';
+    show_alloc_mem();
 
-    //printf("%s\n", large_ptr);
-    //printf("%s\n", large_ptr2);
-    //printf("%s\n", large_ptr3);
-    //printf("%s\n", large_ptr4);
-    //printf("%s\n", large_ptr5);
+    ft_free(large_ptr);
+    ft_free(large_ptr2);
+    ft_free(large_ptr3);
+    ft_free(large_ptr4);
+    ft_free(large_ptr5);
+
+    show_alloc_mem();
 }
 
 void    test_small_malloc(){
@@ -56,12 +58,23 @@ void    test_small_malloc(){
     small_ptr3[299] = '\0';
     small_ptr4[299] = '\0';
     small_ptr5[299] = '\0';
-    //printf("%s\n", small_ptr);
-    //printf("%s\n", small_ptr1);
-    //printf("%s\n", small_ptr2);
-    //printf("%s\n", small_ptr3);
-    //printf("%s\n", small_ptr4);
-    //printf("%s\n", small_ptr5);
+
+    show_alloc_mem();
+
+
+    ft_free(small_ptr1);
+    ft_free(small_ptr2);
+
+    show_alloc_mem();
+    show_free_mem();
+
+    ft_free(small_ptr);
+    ft_free(small_ptr3);
+    ft_free(small_ptr4);
+    ft_free(small_ptr5);
+
+
+
 }
 
 void    test_tiny_malloc(){
@@ -87,34 +100,16 @@ void    test_tiny_malloc(){
     tiny_ptr4[49] = '\0';
     tiny_ptr5[49] = '\0';
 
-    /*print_str(tiny_ptr);
-    print_str("\n");
-
-    print_str(tiny_ptr1);
-    print_str("\n");
-
-    print_str(tiny_ptr2);
-    print_str("\n");
-
-    print_str(tiny_ptr3);
-    print_str("\n");
-
-    print_str(tiny_ptr4);
-    print_str("\n");
-
-    print_str(tiny_ptr5);
-    print_str("\n"); */
 }
 
 int main(){
 
-    test_large_malloc();
+    //test_large_malloc();
 
     test_small_malloc();
 
-    test_tiny_malloc();
+    //test_tiny_malloc();
 
-    show_alloc_mem();
 
     return (0);
 }

@@ -1,6 +1,20 @@
 #include "../includes/malloc_internal.h"
+#include <errno.h>
+#include <sys/mman.h>
 
-void  delete_zone_from_list(t_zone **head_zone, t_zone *zone_to_delete){
+void    return_memory_to_kernel(t_zone *assigned_zone){
+    int status_returned = munmap(assigned_zone, assigned_zone->zone_size);
+    if (status_returned == -1){
+        perror("munmap");
+        errno = EINVAL;
+        #ifdef DEBUG
+            print_str("errore in munmap per zona=");
+            print_hex_address(assigned_zone);
+        #endif
+    }
+}
+
+void    delete_zone_from_list(t_zone **head_zone, t_zone *zone_to_delete){
     t_zone  *current_zone = (*head_zone);
     t_zone  *prev_zone = NULL;
 

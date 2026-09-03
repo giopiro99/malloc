@@ -50,7 +50,11 @@ static inline void  print_large_zones(){
 }
 
 void    show_alloc_mem(){
+    if (malloc_zones.tiny_zones == NULL && malloc_zones.small_zones == NULL && malloc_zones.large_zones == NULL){
+        return ;
+    }
     print_generic_zones(malloc_zones.tiny_zones, "TINY : ");
     print_generic_zones(malloc_zones.small_zones, "SMALL : ");
-    print_large_zones(); 
+    print_large_zones();
+    print_str("==================FINE SHOW ALLOC MEM==================\n\n");
 }

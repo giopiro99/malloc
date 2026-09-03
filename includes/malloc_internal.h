@@ -108,6 +108,7 @@ void    try_free_generic_memory(t_zone *assigned_area, void *ptr);
 //free utils
 void    delete_zone_from_list(t_zone **head_zone, t_zone *zone_to_delete);
 t_zone  *find_zone_by_ptr(void *ptr);
+void    return_memory_to_kernel(t_zone *assigned_zone);
 
 //malloc functions
 void    *alloc_large_area(size_t block_size);
@@ -123,10 +124,14 @@ void    add_new_free_block(t_block **first_free_block, t_block *new_free_block);
 void    split_block(t_block **first_free_block, t_block *free_block, t_zone *assigned_zone, size_t block_size);
 void    *handle_perfect_fit(t_block **first_free_block, t_block *block);
 t_zone  *get_zone_from_block(t_zone **head_zone, t_block *block);
+void    remove_block_from_free_list(t_block **first_free_block, t_block *block);
 
 //print utils
 void    print_str(char *str);
 void    print_nbr(size_t n);
 void    print_hex_address(void *ptr);
 
+//memory view utils
+void    show_alloc_mem();
+void    show_free_mem();
 #endif
